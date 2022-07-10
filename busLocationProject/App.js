@@ -1,25 +1,32 @@
-import {StyleSheet, Text, View} from 'react-native';
-import { createAppContainer } from 'react-navigation';
-import { createStackNavigator } from 'react-navigation-stack'
-import MainScreen from "./Components/MainScreen";
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ *
+ * naver map
+ * https://yannichoongs.tistory.com/162
+ * @format
+ * @flow strict-local
+ */
 
-/*
-* https://velog.io/@anpigon/React-Native-UI-%EB%A7%8C%EB%93%A4%EA%B8%B0-1
-* setting
-* */
-const AppStackNavigator = createStackNavigator({
-    Main : {
-        screen: MainScreen
-    }
-})
+import React from 'react';
+import type, {Node} from 'react';
+import {
+    SafeAreaView,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    useColorScheme,
+    View,
+} from 'react-native';
 
-export default createAppContainer(AppStackNavigator);
-o
-// export default function App() {
-//     return (
-//         <View style={styles.container}>
-//             <Text>Open up App.js to start working on your app!</Text>
-//             <StatusBar style="auto"/>
-//         </View>
-//     );
-// }
+import MainScreen from './Components/Screens/MainScreen'
+
+
+const App: () => Node = () => {
+    return (
+        <MainScreen/>
+    );
+};
+
+export default App;

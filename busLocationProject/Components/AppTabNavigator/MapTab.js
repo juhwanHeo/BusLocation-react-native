@@ -1,12 +1,18 @@
 import React, { Component } from 'react';
-import {View, Text, StyleSheet, Platform} from 'react-native';
-import {Icon} from 'native-base'
+import {View, StyleSheet} from 'react-native';
+import MapView from "../View/MapView";
 
 export default class MapTab extends Component {
+    static navigationOptions = {
+        // tabBarIcon: ({ tintColor }) => (
+        //     <Ionicons name='map' style={{ color: tintColor, fontSize: 30}} />
+        // )
+    }
+
     render() {
         return (
             <View style={style.container}>
-                <Text>MapTab</Text>
+                <MapView />
             </View>
         );
     }
