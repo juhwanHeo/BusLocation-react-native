@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import {Icon} from 'native-base'
+// import {Ionicons} from "@expo/vector-icons";
 
 export default class TimetableTab extends Component {
     static navigationOptions = {
         // tabBarIcon: ({ tintColor }) => (
-        //     <Icon name='ios-home' style={{ color: tintColor }} />
+        //     <Ionicons name='time' style={{ color: tintColor, fontSize: 30}} />
         // )
     }
     render() {

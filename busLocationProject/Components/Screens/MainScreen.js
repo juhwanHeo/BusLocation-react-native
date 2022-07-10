@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
 import { StyleSheet, Platform, Text, View } from 'react-native';
 import { createAppContainer } from 'react-navigation';
-import {Icon} from 'native-base';
 import { createBottomTabNavigator } from "react-navigation-tabs";
-import HomeTab from "./AppTabNavigator/HomeTab";
-import MapTab from "./AppTabNavigator/MapTab";
-import TimetableTab from "./AppTabNavigator/TimetableTab";
-
+import HomeTab from "../AppTabNavigator/HomeTab";
+import MapTab from "../AppTabNavigator/MapTab";
+import TimetableTab from "../AppTabNavigator/TimetableTab";
 
 const AppTabNavigator = createBottomTabNavigator({
     HomeTab: {screen: HomeTab},

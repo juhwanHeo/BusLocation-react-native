@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import {Icon} from 'native-base'
-import {Ionicons} from "@expo/vector-icons";
+// import {Ionicons} from "@expo/vector-icons";
 
 export default class HomeTab extends Component {
 
     static navigationOptions = {
-        tabBarIcon: ({ tintColor }) => (
-            <Ionicons name='home' style={{ color: tintColor, fontSize: 30}} />
-        )
+        // tabBarIcon: ({ tintColor }) => (
+        //     <Ionicons name='home' style={{ color: tintColor, fontSize: 30}} />
+        // )
     }
 
     render() {
