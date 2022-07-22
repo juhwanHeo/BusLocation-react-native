@@ -1,34 +1,120 @@
+import React, { useState, useEffect } from 'react';
+import NaverMapView, {Marker} from "react-native-nmap";
+import axios from "axios";
+import Config from "react-native-config";
+import {Button, View, StyleSheet, Text} from "react-native";
+import FloatButton from "../utils/FloatButton";
 
-import React from 'react';
-import NaverMapView, {Circle, Marker, Path, Polygon, Polyline} from "react-native-nmap";
-import {Text} from "react-native";
 
-// https://webruden.tistory.com/302
+// const [items, setItems] = useState('')
+class MapView extends React.Component {
+    state = {
+        locations: [
+            {
+                id: 1,
+                latitude: 37.660900,
+                longitude: 127.32249
+            }
+        ],
+        busMarkers: null,
+        stationMarker: null
+    }
+    async getLocation() {
+        axios.get(`${Config.API_URL}/bus-logs`, {
+            headers: {
+                // ... jwt 추가
+            }
+        }).then((result) => {
+            return result.data;
+        }).then(json => {
+            console.log(`data: ${JSON.stringify(json)}`)
+            this.setState({
+                busMarkers: [json]
+            });
+        }).catch(e => {  // API 호출이 실패한 경우
+            console.error(e);  // 에러표시
+            this.setState({
+                // loading: false
+            });
+        });
+        // this.forceUpdate();
+    };
 
-function MyMap() {
-    const P0 = {latitude: 37.564362, longitude: 126.977011};
-    const P1 = {latitude: 37.565051, longitude: 126.978567};
-    const P2 = {latitude: 37.565383, longitude: 126.976292};
+    componentDidMount() {
+        this.getLocation();  // loadItem 호출
+    }
 
-    return <NaverMapView style={{width: '100%', height: '100%'}}
-                         showsMyLocationButton={true}
-                         center={{...P0, zoom: 16}}
-                         onTouch={e => console.warn('onTouch', JSON.stringify(e.nativeEvent))}
-                         onCameraChange={e => console.warn('onCameraChange', JSON.stringify(e))}
-                         onMapClick={e => console.warn('onMapClick', JSON.stringify(e))}>
-        <Marker coordinate={P0} onClick={() => console.warn('onClick! p0')}/>
-        <Marker coordinate={P1} pinColor="blue" onClick={() => console.warn('onClick! p1')}/>
-        <Marker coordinate={P2} pinColor="red" onClick={() => console.warn('onClick! p2')}/>
-        <Path coordinates={[P0, P1]} onClick={() => console.warn('onClick! path')} width={10}/>
-        <Polyline coordinates={[P1, P2]} onClick={() => console.warn('onClick! polyline')}/>
-        <Circle coordinate={P0} color={"rgba(255,0,0,0.3)"} radius={200} onClick={() => console.warn('onClick! circle')}/>
-        <Polygon coordinates={[P0, P1, P2]} color={`rgba(0, 0, 0, 0.5)`} onClick={() => console.warn('onClick! polygon')}/>
-    </NaverMapView>
+    render() {
+        const {busMarkers, stationMarker, locations} = this.state
+        // const location = locations[0];
+        const location = busMarkers ? busMarkers[0] : locations[0];
+        return (
+            <View style={styles.view}>
+                <NaverMapView
+                    style={styles.map}
+                    center={{...location, zoom: 16}}
+                    useTextureView={true}
+                >
+                    {
+                        busMarkers
+                        && busMarkers.map((position) => {
+                            return (
+                                <Marker
+                                    key={position.id}
+                                    coordinate={{latitude: position.latitude, longitude: position.longitude}}
+                                />
+                            );
+                        })
+                    }
+                </NaverMapView>
+
+
+                <FloatButton
+                    // style={styles.reload}
+                    // title={'test'}
+                    onPress={() => {
+                        this.getLocation()
+                    }}
+                >
+                </FloatButton>
+            </View>
+
+            // <View>
+            //
+            //
+            //
+            //
+            // </View>
+        )
+    }
 }
-const MapView = () => {
-    return (
-        <MyMap />
-        // <Text>test</Text>
-    )
-}
+
+const styles = StyleSheet.create({
+    view: {
+        width: '100%',
+        height: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        padding: 0,
+        margin: 0
+    },
+    map: {
+        // flex: 1,
+        width: '100%',
+        height: '100%'
+    },
+    reload: {
+        width: 60,
+        height: 60,
+        bottom: 40,
+        right: 40,
+        backgroundColor:'#0C9',
+        color: '#FFF',
+        borderRadius: 50,
+        textAlign: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+    }
+});
+
 export default MapView;

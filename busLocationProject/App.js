@@ -4,6 +4,10 @@
  *
  * naver map
  * https://yannichoongs.tistory.com/162
+ *
+ * build setting
+ * https://velog.io/@ricale/React-Native-%EB%B9%8C%EB%93%9C-%ED%99%98%EA%B2%BD-%EB%B6%84%EB%A6%AC
+ *
  * @format
  * @flow strict-local
  */
