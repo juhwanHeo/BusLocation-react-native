@@ -1,38 +1,120 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import NaverMapView, {Marker} from "react-native-nmap";
-
-function MyMap(props) {
-    const locations = props.locations;
-
-    return (
-        <NaverMapView style={{width: '100%', height: '100%'}}
-                      showsMyLocationButton={true}
-                      center={{...locations[0], zoom: 16}}
-            // onTouch={e => console.warn('onTouch', JSON.stringify(e.nativeEvent))}
-            // onCameraChange={e => console.warn('onCameraChange', JSON.stringify(e))}
-            // onMapClick={e => console.warn('onMapClick', JSON.stringify(e))}
-        >
-            {locations.map((location) => {
-                return (<Marker coordinate={location}/>);
-            })}
-            {/*<Marker coordinate={P0} onClick={() => console.warn('onClick! p0')}/>*/}
-            {/*<Marker coordinate={P1} pinColor="blue" onClick={() => console.warn('onClick! p1')}/>*/}
-            {/*<Marker coordinate={P2} pinColor="red" onClick={() => console.warn('onClick! p2')}/>*/}
-        </NaverMapView>
-    );
-}
+import axios from "axios";
+import Config from "react-native-config";
+import {Button, View, StyleSheet, Text} from "react-native";
+import FloatButton from "../utils/FloatButton";
 
 
-const MapView = () => {
+// const [items, setItems] = useState('')
+class MapView extends React.Component {
+    state = {
+        locations: [
+            {
+                id: 1,
+                latitude: 37.660900,
+                longitude: 127.32249
+            }
+        ],
+        busMarkers: null,
+        stationMarker: null
+    }
+    async getLocation() {
+        axios.get(`${Config.API_URL}/bus-logs`, {
+            headers: {
+                // ... jwt 추가
+            }
+        }).then((result) => {
+            return result.data;
+        }).then(json => {
+            console.log(`data: ${JSON.stringify(json)}`)
+            this.setState({
+                busMarkers: [json]
+            });
+        }).catch(e => {  // API 호출이 실패한 경우
+            console.error(e);  // 에러표시
+            this.setState({
+                // loading: false
+            });
+        });
+        // this.forceUpdate();
+    };
 
-    function getLocation() {
-        return [
-            {latitude: 37.565383, longitude: 126.976292}
-        ];
+    componentDidMount() {
+        this.getLocation();  // loadItem 호출
     }
 
-    return (
-        <MyMap locations={getLocation()}/>
-    )
+    render() {
+        const {busMarkers, stationMarker, locations} = this.state
+        // const location = locations[0];
+        const location = busMarkers ? busMarkers[0] : locations[0];
+        return (
+            <View style={styles.view}>
+                <NaverMapView
+                    style={styles.map}
+                    center={{...location, zoom: 16}}
+                    useTextureView={true}
+                >
+                    {
+                        busMarkers
+                        && busMarkers.map((position) => {
+                            return (
+                                <Marker
+                                    key={position.id}
+                                    coordinate={{latitude: position.latitude, longitude: position.longitude}}
+                                />
+                            );
+                        })
+                    }
+                </NaverMapView>
+
+
+                <FloatButton
+                    // style={styles.reload}
+                    // title={'test'}
+                    onPress={() => {
+                        this.getLocation()
+                    }}
+                >
+                </FloatButton>
+            </View>
+
+            // <View>
+            //
+            //
+            //
+            //
+            // </View>
+        )
+    }
 }
+
+const styles = StyleSheet.create({
+    view: {
+        width: '100%',
+        height: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        padding: 0,
+        margin: 0
+    },
+    map: {
+        // flex: 1,
+        width: '100%',
+        height: '100%'
+    },
+    reload: {
+        width: 60,
+        height: 60,
+        bottom: 40,
+        right: 40,
+        backgroundColor:'#0C9',
+        color: '#FFF',
+        borderRadius: 50,
+        textAlign: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+    }
+});
+
 export default MapView;
