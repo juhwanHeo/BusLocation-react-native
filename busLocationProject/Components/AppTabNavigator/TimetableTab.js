@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-// import {Ionicons} from "@expo/vector-icons";
+import {TimetableView} from "../View/TimetableView";
 
 export default class TimetableTab extends Component {
     static navigationOptions = {
@@ -11,7 +11,7 @@ export default class TimetableTab extends Component {
     render() {
         return (
             <View style={style.container}>
-                <Text>TimetableTab</Text>
+                <TimetableView />
             </View>
         );
     }
