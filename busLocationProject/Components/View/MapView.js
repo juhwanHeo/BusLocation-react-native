@@ -102,18 +102,6 @@ const styles = StyleSheet.create({
         // flex: 1,
         width: '100%',
         height: '100%'
-    },
-    reload: {
-        width: 60,
-        height: 60,
-        bottom: 40,
-        right: 40,
-        backgroundColor:'#0C9',
-        color: '#FFF',
-        borderRadius: 50,
-        textAlign: 'center',
-        alignItems: 'center',
-        justifyContent: 'center',
     }
 });
 
