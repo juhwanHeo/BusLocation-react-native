@@ -12,9 +12,9 @@ import {Table, Row, Col, TableWrapper} from 'react-native-table-component';
 *
 * TODO
 * Failed prop type: Invalid prop `style` of type `array` supplied to `Row`, expected `object`
+* 막차 APT 도착 안보이는 현상 수정 필요
 * */
 const Timetable = ({stations, tableData, widthArr}) => {
-
     const [headers, setHeaders] = useState([]);
     useEffect(() => {
         const headerArr = [];
@@ -23,11 +23,6 @@ const Timetable = ({stations, tableData, widthArr}) => {
         })
         setHeaders(headerArr);
     }, [])
-
-    const getTime = (index, time) => {
-        // if (time.station) return headers[index].value === time.station.stationCode ? time.time : '-';
-        return '-';
-    }
 
     return (
         <View style={styles.container}>
@@ -88,32 +83,26 @@ export const TimetableView = () => {
         setStations(stationArr);
         setWidthArr(widths);
         getTimetable();
-        const timetable = [];
-        for (let i = 0; i < 30; i += 1) {
-            const rowData = [];
-            for (let j = 0; j < 9; j += 1) {
-                rowData.push(`${i}${j}`);
-            }
-            timetable.push(rowData);
-        }
-        setTableData(timetable);
-        setLoading(false);
     },[])
 
     const getTimetable = async () => {
-        // 요청이 시작 할 때에는 error 와 users 를 초기화하고
         setError(null);
-        // loading 상태를 true 로 바꿉니다.
         setLoading(true);
         await axios.get(`${Config.API_URL}/timetable`)
             .then((response) => {
                 const data = response.data;
-                
-                /*
-                * data 에 맞게 timetable 수정
-                * */
-                console.log(`data: ${JSON.stringify(data)}`);
+                const timetable = [];
+                data.timeRowList.map((timeRow) => {
+                    const rowData = [];
+                    console.log(`order: ${timeRow.order}`);
+                    rowData.push(timeRow.order);
+                    timeRow.timeList.map((time) => {
+                        rowData.push(time.time ? time.time : '-');
+                    })
+                    timetable.push(rowData);
+                });
                 setStations(stationArr);
+                setTableData(timetable)
             }).catch((e) => {
                 console.log(`error: ${JSON.stringify(e)}`);
                 setError(e);
@@ -126,18 +115,13 @@ export const TimetableView = () => {
     return (
         <View>
             <Timetable stations={stations} tableData={tableData} widthArr={widthArr}/>
-            <FloatButton
-                onPress={() => {
-                    getTimetable();
-                }}
-            >
-            </FloatButton>
+            <FloatButton onPress={getTimetable}/>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {flex: 1, padding: 16, paddingTop: 30, backgroundColor: '#fff'},
+    container: {flex: 1, padding: 5, paddingBottom: 30, backgroundColor: '#fff'},
     header: {height: 50, backgroundColor: '#537791'},
     headerText: {textAlign: 'center', color: '#fff'},
     text: {textAlign: 'center', fontWeight: '300'},
@@ -150,17 +134,5 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         padding: 0,
         margin: 0
-    },
-    reload: {
-        width: 60,
-        height: 60,
-        bottom: 40,
-        right: 40,
-        backgroundColor: '#0C9',
-        color: '#FFF',
-        borderRadius: 50,
-        textAlign: 'center',
-        alignItems: 'center',
-        justifyContent: 'center',
     }
 });
