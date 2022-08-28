@@ -4,36 +4,33 @@ import {
     Text,
     StyleSheet,
 } from 'react-native';
+// @ts-ignore
 import {Icon} from "react-native-vector-icons/dist";
 import Ionicons from "react-native-vector-icons/Ionicons";
 /*
 * icon
 * https://github.com/oblador/react-native-vector-icons#android
 * */
-export default class FloatButton extends Component {
 
-    static defaultProps = {
-        title: 'untitled',
-        buttonColor: '#000',
-        titleColor: '#fff',
-        onPress: () => null,
-    }
+interface FloatButtonProps {
+    title?: string,
+    buttonColor?: string,
+    titleColor?: string,
+    onPress() : Promise<void>
 
-    constructor(props) {
-        super(props);
-    }
+}
 
-    render() {
-        return (
-            <TouchableOpacity
-                onPress={this.props.onPress}
-                style={[
-                    styles.button]}
-            >
-                <Ionicons name='md-reload' size={30} color='#fff' />
-            </TouchableOpacity>
-        )
-    }
+export const FloatButton = (props: FloatButtonProps) => {
+
+    return (
+        <TouchableOpacity
+            onPress={props.onPress}
+            style={[styles.button]}
+        >
+            <Ionicons name='md-reload' size={30} color='#fff' />
+        </TouchableOpacity>
+    )
+
 }
 
 const styles = StyleSheet.create({
