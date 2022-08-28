@@ -29,7 +29,7 @@ import {
     View,
 } from 'react-native';
 
-import MainScreen from './Components/Screens/MainScreen'
+import MainScreen from './src/Components/Screens/MainScreen'
 
 
 const App: () => Node = () => {

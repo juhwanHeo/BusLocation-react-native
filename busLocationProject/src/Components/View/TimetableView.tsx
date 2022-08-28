@@ -1,10 +1,10 @@
 import React, {useState, useEffect} from 'react';
-import axios from "axios";
+import axios, {AxiosResponse} from "axios";
 import Config from "react-native-config";
 import {Button, View, StyleSheet, Text, ScrollView} from "react-native";
-import FloatButton from "../utils/FloatButton";
-import {Table, Row, Col, TableWrapper} from 'react-native-table-component';
-
+import {FloatButton} from "../utils/FloatButton";
+import {Table, Row} from 'react-native-table-component';
+import {ITimetable, IStation, ITimeRow, ITime} from "../../types/types";
 
 /*
 *
@@ -14,12 +14,18 @@ import {Table, Row, Col, TableWrapper} from 'react-native-table-component';
 * Failed prop type: Invalid prop `style` of type `array` supplied to `Row`, expected `object`
 * 막차 APT 도착 안보이는 현상 수정 필요
 * */
-const Timetable = ({stations, tableData, widthArr}) => {
-    const [headers, setHeaders] = useState([]);
+interface TimetableProps {
+    stations?: IStation[],
+    tableData?: Array<Array<string | number>>,
+    widthArr?: number[]
+}
+
+const Timetable = (props: TimetableProps) => {
+    const [headers, setHeaders] = useState<string[]>(['']);
     useEffect(() => {
-        const headerArr = [];
-        stations.map((station) => {
-            headerArr.push(station.text);
+        const headerArr : string[] = [];
+        props.stations?.map((station) => {
+            headerArr.push(station.stationName);
         })
         setHeaders(headerArr);
     }, [])
@@ -32,20 +38,18 @@ const Timetable = ({stations, tableData, widthArr}) => {
                     <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
                         <Row
                             data={headers}
-                            widthArr={widthArr}
+                            widthArr={props.widthArr}
                             style={styles.header}
                             textStyle={styles.headerText}
                         />
-
-
                     </Table>
                     <ScrollView style={styles.dataWrapper}>
                         <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
-                            { tableData.map((rowData, index) => (
+                            { props.tableData?.map((rowData, index) => (
                                 <Row
                                     key={index}
                                     data={rowData}
-                                    widthArr={widthArr}
+                                    widthArr={props.widthArr}
                                     style={styles.row}
                                     textStyle={styles.text}
                                 />
@@ -59,44 +63,45 @@ const Timetable = ({stations, tableData, widthArr}) => {
     );
 }
 
-const stationArr = [
-    {text: '순서', align: 'start', value: 'order'},
-    {text: 'APT 출발', value: 'S001',},
-    {text: '마석역 \n1번출구', value: 'S002'},
-    {text: '심석 중.고', value: 'S004'},
-    {text: '송라 초.중', value: 'S005'},
-    {text: '마석 초.중', value: 'S006'},
-    {text: '마석고', value: 'S007'},
-    {text: '마석역 \n2번출구', value: 'S003'},
-    {text: 'APT 도착', value: 'S001'},
+const stationArr: IStation[] = [
+    {id: '', facilityId: '', lat: 3, lon: 3, stationName: '순서', stationCode: 'order'},
+    {id: '', facilityId: '', lat: 3, lon: 3, stationName: 'APT 출발', stationCode: 'S001',},
+    {id: '', facilityId: '', lat: 3, lon: 3, stationName: '마석역 \n1번출구', stationCode: 'S002'},
+    {id: '', facilityId: '', lat: 3, lon: 3, stationName: '심석 중.고', stationCode: 'S004'},
+    {id: '', facilityId: '', lat: 3, lon: 3, stationName: '송라 초.중', stationCode: 'S005'},
+    {id: '', facilityId: '', lat: 3, lon: 3, stationName: '마석 초.중', stationCode: 'S006'},
+    {id: '', facilityId: '', lat: 3, lon: 3, stationName: '마석고', stationCode: 'S007'},
+    {id: '', facilityId: '', lat: 3, lon: 3, stationName: '마석역 \n2번출구', stationCode: 'S003'},
+    {id: '', facilityId: '', lat: 3, lon: 3, stationName: 'APT 도착', stationCode: 'S001'},
 ];
 const widths = [100, 100, 100, 100, 100, 100, 100, 100, 100];
 export const TimetableView = () => {
-    const [stations, setStations] = useState(stationArr);
-    const [widthArr, setWidthArr] = useState([]);
-    const [tableData, setTableData] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+    const [stations, setStations] = useState<IStation[]>(stationArr);
+    const [tableData, setTableData] = useState<Array<Array<string | number>>>([]);
+    const [widthArr, setWidthArr] = useState<number[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [error, setError] = useState<any>();
 
     useEffect(() => {
+        console.log(`TimetableView ...`);
         setLoading(true);
         setStations(stationArr);
         setWidthArr(widths);
         getTimetable();
     },[])
 
-    const getTimetable = async () => {
+    const getTimetable = async () : Promise<void> => {
         setError(null);
         setLoading(true);
         await axios.get(`${Config.API_URL}/timetable`)
-            .then((response) => {
+            .then((response: AxiosResponse<ITimetable>) => {
                 const data = response.data;
-                const timetable = [];
-                data.timeRowList.map((timeRow) => {
-                    const rowData = [];
+                const timetable : Array<Array<string | number>> = [];
+                data.timeRowList.map((timeRow : ITimeRow) => {
+                    const rowData : Array<string | number> = [];
                     console.log(`order: ${timeRow.order}`);
                     rowData.push(timeRow.order);
-                    timeRow.timeList.map((time) => {
+                    timeRow.timeList.map((time : ITime) => {
                         rowData.push(time.time ? time.time : '-');
                     })
                     timetable.push(rowData);
@@ -106,22 +111,21 @@ export const TimetableView = () => {
             }).catch((e) => {
                 console.log(`error: ${JSON.stringify(e)}`);
                 setError(e);
-            });
-        setLoading(false);
+            }).then(() => setLoading(false));
     };
 
     if (loading) return <View><Text>로딩중..</Text></View>;
-    if (error) return <View><Text>에러가 발생했습니다..</Text></View>;
+    if (error) return <View><Text>에러가 발생했습니다..</Text><Text>error: ${JSON.stringify(error)}</Text></View>;
     return (
         <View>
             <Timetable stations={stations} tableData={tableData} widthArr={widthArr}/>
-            <FloatButton onPress={getTimetable}/>
+            <FloatButton onPress={getTimetable} buttonColor={''} title={''} titleColor={''}/>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {flex: 1, padding: 5, paddingBottom: 30, backgroundColor: '#fff'},
+    container: {flex: 1, padding: 5, paddingTop: 50, paddingBottom: 30, backgroundColor: '#fff'},
     header: {height: 50, backgroundColor: '#537791'},
     headerText: {textAlign: 'center', color: '#fff'},
     text: {textAlign: 'center', fontWeight: '300'},
