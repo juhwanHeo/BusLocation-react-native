@@ -21,6 +21,27 @@ export const MapView = (props: MapViewProps) => {
     useEffect(() => {
     }, []);
 
+    const getLocation = async () : Promise<void> => {
+        axios.get(`${Config.API_URL}/bus-logs`, {
+            headers: {
+                // ... jwt 추가
+            }
+        }).then((result) => {
+            return result.data;
+        }).then(json => {
+            console.log(`data: ${JSON.stringify(json)}`)
+            // this.setState({
+            //     busMarkers: [json]
+            // });
+        }).catch(e => {  // API 호출이 실패한 경우
+            console.error(e);  // 에러표시
+            // this.setState({
+            //     loading: false
+            // });
+        });
+    };
+
+
     return (
         <View style={styles.view}>
             <NaverMapView
@@ -41,16 +62,11 @@ export const MapView = (props: MapViewProps) => {
                 {/*}*/}
             </NaverMapView>
 
-
             <FloatButton
                 // style={styles.reload}
                 // title={'test'}
-                onPress={() => {
-                    // return this.getLocation();
-                    return '1';
-                }}
-            >
-            </FloatButton>
+                onPress={getLocation}
+            />
         </View>
 
     )

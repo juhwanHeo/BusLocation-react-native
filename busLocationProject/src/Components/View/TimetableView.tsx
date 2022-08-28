@@ -15,15 +15,17 @@ import {ITimetable, IStation, ITimeRow, ITime} from "../../types/types";
 * 막차 APT 도착 안보이는 현상 수정 필요
 * */
 interface TimetableProps {
-    stations?: IStation[],
+    title? : string,
+    contents? : string,
+    stations?: Array<IStation>,
     tableData?: Array<Array<string | number>>,
-    widthArr?: number[]
+    widthArr?: Array<number>
 }
 
 const Timetable = (props: TimetableProps) => {
-    const [headers, setHeaders] = useState<string[]>(['']);
+    const [headers, setHeaders] = useState<Array<string>>(['']);
     useEffect(() => {
-        const headerArr : string[] = [];
+        const headerArr : Array<string> = [];
         props.stations?.map((station) => {
             headerArr.push(station.stationName);
         })
@@ -63,7 +65,7 @@ const Timetable = (props: TimetableProps) => {
     );
 }
 
-const stationArr: IStation[] = [
+const stationArr: Array<IStation> = [
     {id: '', facilityId: '', lat: 3, lon: 3, stationName: '순서', stationCode: 'order'},
     {id: '', facilityId: '', lat: 3, lon: 3, stationName: 'APT 출발', stationCode: 'S001',},
     {id: '', facilityId: '', lat: 3, lon: 3, stationName: '마석역 \n1번출구', stationCode: 'S002'},
@@ -76,50 +78,62 @@ const stationArr: IStation[] = [
 ];
 const widths = [100, 100, 100, 100, 100, 100, 100, 100, 100];
 export const TimetableView = () => {
-    const [stations, setStations] = useState<IStation[]>(stationArr);
+    const [stations, setStations] = useState<Array<IStation>>(stationArr);
+    const [timetable, setTimetable] = useState<ITimetable>();
     const [tableData, setTableData] = useState<Array<Array<string | number>>>([]);
-    const [widthArr, setWidthArr] = useState<number[]>([]);
-    const [loading, setLoading] = useState<boolean>(false);
+    const [widthArr, setWidthArr] = useState<Array<number>>([]);
+    const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<any>();
 
     useEffect(() => {
         console.log(`TimetableView ...`);
-        setLoading(true);
         setStations(stationArr);
         setWidthArr(widths);
-        getTimetable();
+        getTimetable().then(() => setLoading(false));
     },[])
+
+    useEffect(() => {
+        if (timetable) {
+            const timetableData : Array<Array<string | number>> = [];
+            timetable.timeRowList.map((timeRow : ITimeRow) => {
+                const rowData : Array<string | number> = [];
+                console.log(`order: ${timeRow.order}`);
+                rowData.push(timeRow.order);
+                timeRow.timeList.map((time : ITime) => {
+                    rowData.push(time.time ? time.time : '-');
+                })
+                timetableData.push(rowData);
+            });
+
+            setStations(stationArr);
+            setTableData(timetableData)
+        }
+    }, [timetable]);
 
     const getTimetable = async () : Promise<void> => {
         setError(null);
         setLoading(true);
         await axios.get(`${Config.API_URL}/timetable`)
             .then((response: AxiosResponse<ITimetable>) => {
-                const data = response.data;
-                const timetable : Array<Array<string | number>> = [];
-                data.timeRowList.map((timeRow : ITimeRow) => {
-                    const rowData : Array<string | number> = [];
-                    console.log(`order: ${timeRow.order}`);
-                    rowData.push(timeRow.order);
-                    timeRow.timeList.map((time : ITime) => {
-                        rowData.push(time.time ? time.time : '-');
-                    })
-                    timetable.push(rowData);
-                });
-                setStations(stationArr);
-                setTableData(timetable)
+                setTimetable(response.data);
             }).catch((e) => {
                 console.log(`error: ${JSON.stringify(e)}`);
                 setError(e);
-            }).then(() => setLoading(false));
+            });
     };
 
     if (loading) return <View><Text>로딩중..</Text></View>;
     if (error) return <View><Text>에러가 발생했습니다..</Text><Text>error: ${JSON.stringify(error)}</Text></View>;
     return (
         <View>
-            <Timetable stations={stations} tableData={tableData} widthArr={widthArr}/>
-            <FloatButton onPress={getTimetable} buttonColor={''} title={''} titleColor={''}/>
+            <Timetable
+                title={timetable?.title}
+                contents={timetable?.contents}
+                stations={stations}
+                tableData={tableData}
+                widthArr={widthArr}
+            />
+            {/*<FloatButton onPress={getTimetable} buttonColor={''} title={''} titleColor={''}/>*/}
         </View>
     );
 }

@@ -11,7 +11,9 @@ export interface IStation {
 export interface ITimetable {
     id: string,
     facilityId: string,
-    timeRowList: ITimeRow[],
+    timeRowList: Array<ITimeRow>,
+    title?: string,
+    contents?: string,
     inputDate: Date,
     updateDate: Date
 }
@@ -24,7 +26,7 @@ export interface ITimeRow {
     startTimeMillis: bigint,
     endTime: string,
     endTimeMillis: bigint,
-    timeList: ITime[]
+    timeList: Array<ITime>
 }
 
 export interface ITime {
